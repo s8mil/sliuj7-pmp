@@ -3,10 +3,6 @@ import geopy
 geolocator = geopy.geocoders.Nominatim(user_agent="solar_project")
 
 def city_to_coordinates(city):
-    if len(city) > 100 or len(city) < 1 or city.isdigit():
-        print("City name doesn't meet character requirements.")
-        return None
-
     try:
         result = geolocator.geocode(city)
 
