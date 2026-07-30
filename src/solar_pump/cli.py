@@ -23,7 +23,7 @@ def location_input():
             return None
         if option == "1":
             while True:
-                city = input("Input your desired city: ").strip()
+                city = input("Input your desired city: ").strip().title()
 
                 if len(city) > 100 or len(city) < 1 or city.isdigit():
                     print("City name doesn't meet character requirements.")
@@ -75,12 +75,12 @@ def location_input():
     print("\nUsing coordinates:")
     print(latitude, longitude)  
 
-    return latitude, longitude
+    return city, latitude, longitude
 
 def irradiance_input():
     while True:
         option = input(
-            "Choose an irradiance dataset:\n"
+            "\nChoose an irradiance dataset:\n"
             "0. Cancel\n"
             "1. Last 6 months\n"
             "2. Last 5 years\n"
@@ -127,40 +127,14 @@ def irradiance_input():
     
 
 def pump_input():
-    power = float(input("Input the pumps power:\n"))
+    power = float(input("Input the pumps power [W]:\n"))
     return power
 
 def panel_input():
-    power = float(input("Input the panel's power:\n"))
-    area = float(input("Input the panel's area:\n"))
+    power = float(input("Input the panel's power [W]:\n"))
+    area = float(input("Input the panel's area [m²]:\n"))
     quantity = int(input("Input the total number of panels:\n"))
     return power, area, quantity
-
-def export_data(df):
-    while True:
-        option = input(
-            "Choose an exporting option:\n"
-            "0. Cancel\n"
-            "1. CSV\n"
-            "2. Excel\n\n"
-            "Option: "
-        )
-
-        if option == "1":
-            export.export_csv(df)
-            break
-
-        elif option == "2":
-            export.export_excel(df)
-            break
-
-        elif option == "0":
-            print("Export cancelled.")
-            break
-
-        else:
-            print("Invalid option.")
-
 
 def export_data(df):
     while True:
@@ -206,7 +180,7 @@ def run():
             print("Closing...")
             break
 
-        latitude, longitude = result
+        city, latitude, longitude= result
 
         start_date, end_date = irradiance_input()
 
@@ -224,7 +198,7 @@ def run():
 
         panel_power, panel_area, panel_quantity = panel_input()
 
-        df = calculations.potency(
+        df = calculations.power(
             df,
             panel_power,
             panel_area
@@ -236,9 +210,22 @@ def run():
             panel_quantity
         )
 
+        df_names = df.rename(columns={
+            "irradiance": "Irradiance [W/m²]",
+            "power": "Power [W]",
+            "photovoltaic_power": "Photovoltaic Power [W]"
+         })
+        
+        solar_peak = calculations.solar_peak(df)
+
+        print(df_names.to_string(index=False))
+        print(f"\nSolar Peak Hour: {solar_peak:.2f} kWh/kWp/day")
+
         graph.curvegraph(
             df,
-            pump_power
+            pump_power,
+            city,
+            solar_peak
         )
 
         if input("\nDo you want to export the data? (Y/N): ").strip().lower() == "y":
