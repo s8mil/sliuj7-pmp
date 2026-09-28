@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 def find_crossings(x, y, threshold):
     """Encuentra los puntos x (interpolados) donde y cruza threshold."""
     x = np.array(x, dtype=float)
@@ -33,7 +32,14 @@ def insert_points(x, y, extra_x):
     return new_x[keep], new_y[keep]
 
 
-def curvegraph(df, pump_power, city, solar_peak):
+def curvegraph(
+    df,
+    pump_power,
+    city,
+    solar_peak,
+    panel_quantity,
+    panel_power
+):
 
     x = list(range(len(df)))
     pv = df["photovoltaic_power"]
@@ -67,11 +73,9 @@ def curvegraph(df, pump_power, city, solar_peak):
     if crossings:
         c_min, c_max = min(crossings), max(crossings)
 
-        # Índices exactos de los puntos de cruce dentro del arreglo aumentado
         i_min = np.searchsorted(ax, c_min)
         i_max = np.searchsorted(ax, c_max)
 
-        # --- Tramo izquierdo (amarillo): desde el inicio hasta el primer cruce ---
         plt.fill_between(
             ax[:i_min + 1],
             0,
@@ -81,7 +85,6 @@ def curvegraph(df, pump_power, city, solar_peak):
             label="Partial Operation"
         )
 
-        # --- Tramo central (verde): entre los dos cruces ---
         plt.fill_between(
             ax[i_min:i_max + 1],
             0,
@@ -91,7 +94,6 @@ def curvegraph(df, pump_power, city, solar_peak):
             label="Maximum Efficiency"
         )
 
-        # --- Tramo derecho (amarillo): desde el segundo cruce hasta el final ---
         plt.fill_between(
             ax[i_max:],
             0,
@@ -99,8 +101,19 @@ def curvegraph(df, pump_power, city, solar_peak):
             color="gold",
             alpha=0.5
         )
+
+        max_efficiency_hours = c_max - c_min
+
+        plt.text(
+            (c_min + c_max) / 2,
+            pump_power * 0.5,
+            f"{max_efficiency_hours:.0f} hours",
+            ha="center",
+            va="center",
+            fontsize=12,
+            fontweight="bold"
+    )
     else:
-        # Caso borde: la curva nunca alcanza pump_power -> todo es amarillo
         plt.fill_between(
             ax,
             0,
@@ -112,7 +125,7 @@ def curvegraph(df, pump_power, city, solar_peak):
             label="Partial Operation"
         )
 
-    # --- Unused energy: rojo donde pv > pump_power ---
+    # Unused energy
     plt.fill_between(
         ax,
         pump_power,
@@ -124,7 +137,7 @@ def curvegraph(df, pump_power, city, solar_peak):
         label="Unused Energy"
     )
 
-    # --- Líneas verticales negras justo donde pv cruza pump_power ---
+    # Líneas verticales en los cruces
     for xc in crossings:
         plt.vlines(
             x=xc,
@@ -135,11 +148,18 @@ def curvegraph(df, pump_power, city, solar_peak):
             linewidth=2,
             alpha=0.8
         )
-    # Entrada única en la leyenda para el umbral
-    if crossings:
-        plt.plot([], [], color="black", linestyle="--", linewidth=2, label="Max Efficiency Threshold")
 
-    # --- Puntos de intersección: círculos del mismo tamaño que los de la línea pv (sin leyenda) ---
+    if crossings:
+        plt.plot(
+            [],
+            [],
+            color="black",
+            linestyle="--",
+            linewidth=2,
+            label="Max Efficiency Threshold"
+        )
+
+    # Puntos de intersección
     if crossings:
         plt.plot(
             crossings,
@@ -153,7 +173,7 @@ def curvegraph(df, pump_power, city, solar_peak):
             zorder=6
         )
 
-    # Green dots for hours where photovoltaic power is greater than or equal to pump power
+    # Green dots
     plt.scatter(
         [i for i in x if pv.iloc[i] >= pump_power],
         [pv.iloc[i] for i in x if pv.iloc[i] >= pump_power],
@@ -170,8 +190,12 @@ def curvegraph(df, pump_power, city, solar_peak):
     plt.title("Photovoltaic Power vs Pump Rated Power")
 
     plt.figtext(
-        0.125, 0.92,
-        f"Location: {city}\nSolar Peak Hour: {solar_peak:.2f} kWh/kWp/day",
+        0.125,
+        0.92,
+        f"Location: {city}\n"
+        f"Solar Peak Hour: {solar_peak:.2f} kWh/kWp/day\n"
+        f"Panels: {panel_quantity}\n"
+        f"Installed Power: {panel_power * panel_quantity} W",
         ha="left",
         va="top",
         fontsize=10

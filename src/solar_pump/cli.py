@@ -166,7 +166,7 @@ def run():
 
     print("=" * width)
     print("PROJECT protoJ".center(width))
-    print("Build_0.280726_alpha".center(width))
+    print("Beta v1.0".center(width))
     print("=" * width)
     print("Photovoltaic Water Pump Sizing Calculator".center(width))
     print("Development Build".center(width))
@@ -225,7 +225,9 @@ def run():
             df,
             pump_power,
             city,
-            solar_peak
+            solar_peak,
+            panel_quantity,
+            panel_power
         )
 
         if input("\nDo you want to export the data? (Y/N): ").strip().lower() == "y":
@@ -234,6 +236,7 @@ def run():
         if input("\nNew calculation? (Y/N): ").strip().lower() == "n":
             print("Goodbye!")
             break
+
 
 
 
