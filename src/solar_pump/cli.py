@@ -212,7 +212,7 @@ def run():
 
         df_names = df.rename(columns={
             "irradiance": "Irradiance [W/m²]",
-            "power": "Power [W]",
+            "power": "Power [W/m²]",
             "photovoltaic_power": "Photovoltaic Power [W]"
          })
         
