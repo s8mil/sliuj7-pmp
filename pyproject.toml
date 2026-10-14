@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solar-pump"
+version = "1.0.1"
+description = "Photovoltaic Water Pump Sizing Calculator"
+requires-python = ">=3.10"
+dependencies = [
+    "streamlit",
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "geopy",
+    "python-dateutil",
+    "openpyxl",
+]
+
+[project.scripts]
+solar-pump = "solar_pump.cli:run"
+
+[tool.setuptools.packages.find]
+where = ["src"]

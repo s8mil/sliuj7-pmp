@@ -1,11 +1,11 @@
 import datetime
 from turtle import width
-import export
+from . import export
 import dateutil.relativedelta
-import location
-import irradiance
-import calculations
-import graph
+from . import location
+from . import irradiance
+from . import calculations
+from . import graph
 
 today = datetime.date.today()
 
