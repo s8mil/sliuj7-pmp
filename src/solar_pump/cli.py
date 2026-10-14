@@ -166,7 +166,7 @@ def run():
 
     print("=" * width)
     print("PROJECT protoJ".center(width))
-    print("Beta v1.0".center(width))
+    print("Beta v1.0.1".center(width))
     print("=" * width)
     print("Photovoltaic Water Pump Sizing Calculator".center(width))
     print("Development Build".center(width))
